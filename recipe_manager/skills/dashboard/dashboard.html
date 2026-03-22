@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Dashboard</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --tag-bg: #1f6feb33;
+      --tag-text: #58a6ff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 24px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+    code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--accent);
+    }
+
+    h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { color: var(--text-muted); font-size: 16px; margin-bottom: 32px; }
+    .section-title {
+      font-size: 14px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-muted); margin-bottom: 16px; margin-top: 32px;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: 8px; padding: 48px 24px;
+      text-align: center; color: var(--text-muted); cursor: pointer;
+      transition: border-color 0.2s, background 0.2s; margin-bottom: 32px;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(88, 166, 255, 0.05); }
+    .drop-zone p { margin: 8px 0; font-size: 14px; }
+    .drop-zone .drop-title { font-size: 18px; font-weight: 600; color: var(--text); }
+    .drop-zone input[type="file"] { display: none; }
+
+    /* Tabs */
+    .tabs {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 32px;
+    }
+    .tab {
+      padding: 12px 24px; font-size: 14px; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab .tab-count {
+      display: inline-block; background: var(--tag-bg); color: var(--tag-text);
+      padding: 0 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; font-weight: 400;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Search */
+    .search-bar {
+      width: 100%; padding: 10px 16px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+      font-size: 14px; margin-bottom: 16px; outline: none; transition: border-color 0.2s;
+    }
+    .search-bar:focus { border-color: var(--accent); }
+    .search-bar::placeholder { color: var(--text-muted); }
+
+    /* Table */
+    .recipe-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .recipe-table th, .recipe-table td {
+      text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border);
+    }
+    .recipe-table th {
+      color: var(--text-muted); font-weight: 600; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+    }
+    .recipe-table th:hover { color: var(--text); }
+    .td-muted { color: var(--text-muted); }
+
+    /* Cards */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px; margin-bottom: 16px;
+    }
+    .card h3 { font-size: 16px; margin-bottom: 12px; color: var(--text); }
+    .card p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+    .card ul { padding-left: 20px; margin: 8px 0; }
+    .card li { color: var(--text-muted); font-size: 14px; margin-bottom: 4px; }
+
+    /* Markdown tables */
+    .md-table {
+      width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0;
+    }
+    .md-table th, .md-table td {
+      text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md-table th { color: var(--text); font-weight: 600; }
+    .md-table td { color: var(--text-muted); }
+    .card h4, .card h5 { font-size: 15px; margin: 16px 0 8px; color: var(--text); }
+    .card hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    .reload-btn {
+      background: none; border: 1px solid var(--border); color: var(--text-muted);
+      padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer;
+      transition: color 0.2s, border-color 0.2s; white-space: nowrap; flex-shrink: 0;
+    }
+    .reload-btn:hover { color: var(--text); border-color: var(--text-muted); }
+
+    .dashboard-content { display: none; }
+    .dashboard-content.visible { display: block; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+
+    /* Clickable rows */
+    .recipe-table tbody tr { cursor: pointer; transition: background 0.15s; }
+    .recipe-table tbody tr:hover { background: rgba(88, 166, 255, 0.06); }
+
+    /* Recipe detail overlay */
+    .recipe-detail-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      z-index: 100; justify-content: center; align-items: flex-start; padding: 48px 24px;
+      overflow-y: auto;
+    }
+    .recipe-detail-overlay.visible { display: flex; }
+    .recipe-detail {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 32px; max-width: 700px; width: 100%; position: relative;
+    }
+    .recipe-detail-close {
+      position: absolute; top: 16px; right: 16px; background: none; border: none;
+      color: var(--text-muted); font-size: 24px; cursor: pointer; line-height: 1;
+      padding: 4px 8px; border-radius: 4px; transition: color 0.2s, background 0.2s;
+    }
+    .recipe-detail-close:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .recipe-detail h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; padding-right: 40px; }
+    .recipe-detail .meta-row {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+    }
+    .recipe-detail .meta-tag {
+      display: inline-block; background: var(--tag-bg); color: var(--tag-text);
+      padding: 2px 10px; border-radius: 12px; font-size: 12px;
+    }
+    .recipe-detail .meta-info {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px; margin-bottom: 24px; padding: 16px; background: var(--bg);
+      border-radius: 8px; border: 1px solid var(--border);
+    }
+    .recipe-detail .meta-info-item { text-align: center; }
+    .recipe-detail .meta-info-value { font-size: 16px; font-weight: 600; color: var(--text); }
+    .recipe-detail .meta-info-label {
+      font-size: 11px; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.5px; margin-top: 2px;
+    }
+    .recipe-detail h3 {
+      font-size: 16px; font-weight: 600; color: var(--text); margin: 20px 0 10px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    .recipe-detail ul { padding-left: 20px; margin: 8px 0; }
+    .recipe-detail li { color: var(--text-muted); font-size: 14px; margin-bottom: 6px; }
+    .recipe-detail ol { padding-left: 20px; margin: 8px 0; }
+    .recipe-detail ol li { color: var(--text-muted); font-size: 14px; margin-bottom: 10px; line-height: 1.5; }
+    .recipe-detail .notes { color: var(--text-muted); font-size: 14px; font-style: italic; }
+    .recipe-detail .md-table th, .recipe-detail .md-table td { font-size: 14px; }
+    .recipe-detail h4 { font-size: 15px; font-weight: 600; color: var(--text); margin: 16px 0 8px; }
+    .recipe-detail hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+    .recipe-detail-print {
+      display: inline-block; margin-top: 20px; padding: 8px 20px; background: var(--accent);
+      color: var(--bg); border: none; border-radius: 6px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .recipe-detail-print:hover { background: var(--accent-hover); }
+
+    @media print {
+      body { background: #fff; color: #000; padding: 0; }
+      .drop-zone, .dashboard-content, header, .subtitle, h1 { display: none !important; }
+      .recipe-detail-overlay {
+        display: block !important; position: static; background: none; padding: 0; overflow: visible;
+      }
+      .recipe-detail {
+        background: #fff; border: none; padding: 0; max-width: 100%;
+        box-shadow: none; border-radius: 0;
+      }
+      .recipe-detail-close, .recipe-detail-print { display: none !important; }
+      .recipe-detail h2 { color: #000; padding-right: 0; }
+      .recipe-detail h3 { color: #000; border-bottom-color: #ccc; }
+      .recipe-detail li, .recipe-detail .notes, .recipe-detail p { color: #333; }
+      .recipe-detail .meta-row { gap: 6px; }
+      .recipe-detail .meta-tag {
+        background: #eee; color: #333; border: 1px solid #ccc;
+      }
+      .recipe-detail .meta-info {
+        background: #f8f8f8; border-color: #ccc;
+      }
+      .recipe-detail .meta-info-value { color: #000; }
+      .recipe-detail .meta-info-label { color: #666; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Recipe Dashboard</h1>
+  <p class="subtitle">Load your recipe collection to see stats, browse recipes, and review meal plans.</p>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="dropZone">
+    <p class="drop-title">Load your recipe collection</p>
+    <p>Drag &amp; drop your <code>recipe_manager</code> folder here, or click to select files</p>
+    <p>Supports <code>.md</code> recipe files, meal plans, and shopping lists</p>
+    <input type="file" id="fileInput" multiple webkitdirectory>
+  </div>
+
+  <!-- Dashboard (hidden until files loaded) -->
+  <div class="dashboard-content" id="dashboard">
+
+    <!-- Tabs + reload -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0;">
+      <div class="tabs" id="tabs" style="margin-bottom:0; flex:1;">
+        <div class="tab active" data-tab="recipes">Recipes <span class="tab-count" id="recipeCount">0</span></div>
+        <div class="tab" data-tab="meal-plans">Meal Plans <span class="tab-count" id="mealPlanCount">0</span></div>
+        <div class="tab" data-tab="shopping-lists">Shopping Lists <span class="tab-count" id="shoppingListCount">0</span></div>
+      </div>
+      <button class="reload-btn" id="reloadBtn">Change folder</button>
+    </div>
+
+    <!-- Recipes Tab -->
+    <div class="tab-panel active" id="panel-recipes">
+      <input type="text" class="search-bar" id="searchBar" placeholder="Search recipes by name, cuisine, ingredient, tag...">
+      <div class="chart-card" style="padding: 0; overflow-x: auto; margin-bottom: 60px;">
+        <table class="recipe-table" id="recipeTable">
+          <thead>
+            <tr>
+              <th data-sort="title">Title</th>
+              <th data-sort="cuisine">Cuisine</th>
+              <th data-sort="difficulty">Difficulty</th>
+              <th data-sort="servings">Servings</th>
+              <th data-sort="prep_time">Prep</th>
+              <th data-sort="cook_time">Cook</th>
+              <th data-sort="date_added">Added</th>
+            </tr>
+          </thead>
+          <tbody id="recipeTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Meal Plans Tab -->
+    <div class="tab-panel" id="panel-meal-plans">
+      <div id="mealPlans"></div>
+    </div>
+
+    <!-- Shopping Lists Tab -->
+    <div class="tab-panel" id="panel-shopping-lists">
+      <div id="shoppingLists"></div>
+    </div>
+  </div>
+
+  <!-- Recipe detail overlay -->
+  <div class="recipe-detail-overlay" id="recipeOverlay">
+    <div class="recipe-detail" id="recipeDetail">
+      <button class="recipe-detail-close" id="recipeClose">&times;</button>
+      <div id="recipeDetailContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const CACHE_KEY = 'recipeDashboardData';
+    let allRecipes = [];
+    let mealPlanFiles = [];
+    let shoppingListFiles = [];
+    let sortField = 'title';
+    let sortAsc = true;
+
+    // --- Cache ---
+    function saveToCache() {
+      try {
+        const data = { allRecipes, mealPlanFiles, shoppingListFiles };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+      } catch (e) { /* localStorage full or unavailable */ }
+    }
+
+    function loadFromCache() {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        allRecipes = data.allRecipes || [];
+        mealPlanFiles = data.mealPlanFiles || [];
+        shoppingListFiles = data.shoppingListFiles || [];
+        return allRecipes.length > 0 || mealPlanFiles.length > 0 || shoppingListFiles.length > 0;
+      } catch (e) { return false; }
+    }
+
+    function clearCache() {
+      localStorage.removeItem(CACHE_KEY);
+    }
+
+    // --- Tabs ---
+    document.getElementById('tabs').addEventListener('click', e => {
+      const tab = e.target.closest('.tab');
+      if (!tab) return;
+      const target = tab.dataset.tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + target).classList.add('active');
+    });
+
+    // --- YAML parser ---
+    function parseFrontmatter(text) {
+      const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+      if (!match) return { meta: {}, body: text };
+      const raw = match[1];
+      const body = text.slice(match[0].length).trim();
+      const meta = {};
+      for (const line of raw.split('\n')) {
+        const m = line.match(/^(\w+)\s*:\s*(.+)/);
+        if (!m) continue;
+        let val = m[2].trim();
+        if (val.startsWith('[') && val.endsWith(']')) {
+          val = val.slice(1, -1).split(',').map(s => s.trim()).filter(Boolean);
+        }
+        meta[m[1]] = val;
+      }
+      return { meta, body };
+    }
+
+    function extractIngredients(body) {
+      const section = body.match(/## Ingredients\s*\n([\s\S]*?)(?=\n## |$)/);
+      if (!section) return [];
+      return section[1].split('\n').filter(l => l.trim().startsWith('-')).map(l => l.replace(/^-\s*/, '').trim());
+    }
+
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function inlineFormat(text) {
+      let s = esc(text);
+      s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      s = s.replace(/`(.+?)`/g, '<code>$1</code>');
+      return s;
+    }
+
+    function markdownToHtml(md) {
+      const lines = md.split('\n');
+      let html = '';
+      let inUl = false, inOl = false, inTable = false;
+
+      function closeLists() {
+        if (inUl) { html += '</ul>'; inUl = false; }
+        if (inOl) { html += '</ol>'; inOl = false; }
+      }
+      function closeTable() {
+        if (inTable) { html += '</tbody></table>'; inTable = false; }
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const trimmed = lines[i].trim();
+        if (!trimmed) { closeLists(); closeTable(); continue; }
+
+        // Table separator row (skip)
+        if (trimmed.match(/^\|[\s:-]+\|$/)) continue;
+
+        // Table row
+        if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+          closeLists();
+          const cells = trimmed.slice(1, -1).split('|').map(c => c.trim());
+          // Check if next line is separator — this row is the header
+          const nextLine = (lines[i + 1] || '').trim();
+          if (!inTable && nextLine.match(/^\|[\s:-]+\|$/)) {
+            html += '<table class="md-table"><thead><tr>';
+            html += cells.map(c => `<th>${inlineFormat(c)}</th>`).join('');
+            html += '</tr></thead><tbody>';
+            inTable = true;
+            i++; // skip separator
+          } else {
+            if (!inTable) { html += '<table class="md-table"><tbody>'; inTable = true; }
+            html += '<tr>' + cells.map(c => `<td>${inlineFormat(c)}</td>`).join('') + '</tr>';
+          }
+          continue;
+        }
+
+        closeTable();
+
+        if (trimmed.startsWith('#### ')) {
+          closeLists();
+          html += `<h5>${inlineFormat(trimmed.slice(5))}</h5>`;
+        } else if (trimmed.startsWith('### ')) {
+          closeLists();
+          html += `<h4>${inlineFormat(trimmed.slice(4))}</h4>`;
+        } else if (trimmed.startsWith('## ')) {
+          closeLists();
+          html += `<h3>${inlineFormat(trimmed.slice(3))}</h3>`;
+        } else if (trimmed.startsWith('# ')) {
+          closeLists();
+          html += `<h2>${inlineFormat(trimmed.slice(2))}</h2>`;
+        } else if (trimmed.match(/^[-*]\s/)) {
+          if (inOl) { html += '</ol>'; inOl = false; }
+          if (!inUl) { html += '<ul>'; inUl = true; }
+          html += `<li>${inlineFormat(trimmed.replace(/^[-*]\s+/, ''))}</li>`;
+        } else if (trimmed.match(/^\d+\.\s/)) {
+          if (inUl) { html += '</ul>'; inUl = false; }
+          if (!inOl) { html += '<ol>'; inOl = true; }
+          html += `<li>${inlineFormat(trimmed.replace(/^\d+\.\s+/, ''))}</li>`;
+        } else if (trimmed.startsWith('---') || trimmed.startsWith('***')) {
+          closeLists();
+          html += '<hr>';
+        } else {
+          closeLists();
+          html += `<p>${inlineFormat(trimmed)}</p>`;
+        }
+      }
+      closeLists();
+      closeTable();
+      return html;
+    }
+
+    // --- File loading ---
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    // Load from cache on startup
+    if (loadFromCache()) {
+      renderDashboard();
+    }
+
+    // Reload button
+    document.getElementById('reloadBtn').addEventListener('click', () => {
+      clearCache();
+      allRecipes = []; mealPlanFiles = []; shoppingListFiles = [];
+      document.getElementById('dashboard').classList.remove('visible');
+      dropZone.style.display = '';
+    });
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleItems(e.dataTransfer.items); });
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+    async function handleItems(items) {
+      const entries = [];
+      for (const item of items) {
+        if (item.webkitGetAsEntry) entries.push(item.webkitGetAsEntry());
+      }
+      if (entries.length) processFiles(await readEntries(entries));
+    }
+
+    function readEntries(entries) {
+      return new Promise(resolve => {
+        const files = [];
+        let pending = 0;
+        function traverse(entry) {
+          pending++;
+          if (entry.isFile) {
+            entry.file(f => { f._path = entry.fullPath; files.push(f); if (--pending === 0) resolve(files); });
+          } else if (entry.isDirectory) {
+            const reader = entry.createReader();
+            reader.readEntries(children => { for (const child of children) traverse(child); if (--pending === 0) resolve(files); });
+          }
+        }
+        for (const e of entries) traverse(e);
+      });
+    }
+
+    function handleFiles(fileList) { processFiles(Array.from(fileList)); }
+
+    function processFiles(files) {
+      const mdFiles = files.filter(f => f.name.endsWith('.md'));
+      let loaded = 0;
+      allRecipes = []; mealPlanFiles = []; shoppingListFiles = [];
+
+      mdFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const text = reader.result;
+          const path = file._path || file.webkitRelativePath || file.name;
+
+          if (path.includes('recipes/')) {
+            const { meta, body } = parseFrontmatter(text);
+            if (meta.title) { meta._body = body; meta._ingredients = extractIngredients(body); allRecipes.push(meta); }
+          } else if (path.includes('meal-plans/')) {
+            mealPlanFiles.push({ name: file.name, content: text });
+          } else if (path.includes('shopping-lists/')) {
+            shoppingListFiles.push({ name: file.name, content: text });
+          } else {
+            const { meta, body } = parseFrontmatter(text);
+            if (meta.title && meta.cuisine) { meta._body = body; meta._ingredients = extractIngredients(body); allRecipes.push(meta); }
+          }
+          if (++loaded === mdFiles.length) renderDashboard();
+        };
+        reader.readAsText(file);
+      });
+      if (mdFiles.length === 0) renderDashboard();
+    }
+
+    // --- Rendering ---
+    function renderDashboard() {
+      document.getElementById('dashboard').classList.add('visible');
+      dropZone.style.display = 'none';
+
+      // Update tab counts
+      document.getElementById('recipeCount').textContent = allRecipes.length;
+      document.getElementById('mealPlanCount').textContent = mealPlanFiles.length;
+      document.getElementById('shoppingListCount').textContent = shoppingListFiles.length;
+
+      renderRecipeTable();
+      renderMealPlans();
+      renderShoppingLists();
+      saveToCache();
+    }
+
+    function renderRecipeTable() {
+      const tbody = document.getElementById('recipeTableBody');
+      const query = document.getElementById('searchBar').value.toLowerCase();
+      let filtered = allRecipes;
+      if (query) {
+        filtered = filtered.filter(r => {
+          const haystack = [r.title, r.cuisine, r.difficulty, ...(Array.isArray(r.tags) ? r.tags : []), ...(Array.isArray(r.dietary) ? r.dietary : []), ...(r._ingredients || [])].join(' ').toLowerCase();
+          return haystack.includes(query);
+        });
+      }
+      filtered.sort((a, b) => {
+        let va = a[sortField] || '', vb = b[sortField] || '';
+        if (sortField === 'servings') { va = parseInt(va) || 0; vb = parseInt(vb) || 0; }
+        else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+        if (va < vb) return sortAsc ? -1 : 1;
+        if (va > vb) return sortAsc ? 1 : -1;
+        return 0;
+      });
+      tbody.innerHTML = filtered.length ? filtered.map((r, i) =>
+        `<tr data-recipe-idx="${allRecipes.indexOf(r)}"><td>${esc(r.title||'')}</td><td class="td-muted">${esc(r.cuisine||'')}</td><td class="td-muted">${esc(r.difficulty||'')}</td><td class="td-muted">${esc(String(r.servings||''))}</td><td class="td-muted">${esc(r.prep_time||'')}</td><td class="td-muted">${esc(r.cook_time||'')}</td><td class="td-muted">${esc(r.date_added||'')}</td></tr>`
+      ).join('') : '<tr><td colspan="7" class="td-muted" style="text-align:center;padding:24px;">No recipes match your search.</td></tr>';
+
+      tbody.querySelectorAll('tr[data-recipe-idx]').forEach(row => {
+        row.addEventListener('click', () => showRecipeDetail(allRecipes[parseInt(row.dataset.recipeIdx)]));
+      });
+    }
+
+    // --- Recipe detail ---
+    function showRecipeDetail(r) {
+      const overlay = document.getElementById('recipeOverlay');
+      const content = document.getElementById('recipeDetailContent');
+
+      const tags = Array.isArray(r.tags) ? r.tags : [];
+      const dietary = Array.isArray(r.dietary) ? r.dietary : [];
+      const allTags = [...dietary, ...tags];
+
+      content.innerHTML = `
+        <h2>${esc(r.title || '')}</h2>
+        <div class="meta-row">
+          ${allTags.map(t => `<span class="meta-tag">${esc(t)}</span>`).join('')}
+        </div>
+        <div class="meta-info">
+          <div class="meta-info-item"><div class="meta-info-value">${esc(r.cuisine || '-')}</div><div class="meta-info-label">Cuisine</div></div>
+          <div class="meta-info-item"><div class="meta-info-value">${esc(r.difficulty || '-')}</div><div class="meta-info-label">Difficulty</div></div>
+          <div class="meta-info-item"><div class="meta-info-value">${esc(String(r.servings || '-'))}</div><div class="meta-info-label">Servings</div></div>
+          <div class="meta-info-item"><div class="meta-info-value">${esc(r.prep_time || '-')}</div><div class="meta-info-label">Prep Time</div></div>
+          <div class="meta-info-item"><div class="meta-info-value">${esc(r.cook_time || '-')}</div><div class="meta-info-label">Cook Time</div></div>
+        </div>
+        ${markdownToHtml(r._body)}
+        <button class="recipe-detail-print" onclick="window.print()">Print Recipe</button>
+      `;
+
+      overlay.classList.add('visible');
+    }
+
+    // Close overlay
+    document.getElementById('recipeClose').addEventListener('click', () => {
+      document.getElementById('recipeOverlay').classList.remove('visible');
+    });
+    document.getElementById('recipeOverlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('visible');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.getElementById('recipeOverlay').classList.remove('visible');
+    });
+
+    function renderMealPlans() {
+      const c = document.getElementById('mealPlans');
+      if (!mealPlanFiles.length) {
+        c.innerHTML = '<div class="empty-state">No meal plans loaded.<br>Generate one with <code>/recipe-manager:meal-planning</code></div>';
+        return;
+      }
+      c.innerHTML = mealPlanFiles.map(f => {
+        const { meta, body } = parseFrontmatter(f.content);
+        return `<div class="card"><h3>${esc(meta.title || f.name.replace('.md',''))}</h3>${markdownToHtml(body)}</div>`;
+      }).join('');
+    }
+
+    function renderShoppingLists() {
+      const c = document.getElementById('shoppingLists');
+      if (!shoppingListFiles.length) {
+        c.innerHTML = '<div class="empty-state">No shopping lists loaded.<br>Generate one with <code>/recipe-manager:meal-planning</code></div>';
+        return;
+      }
+      c.innerHTML = shoppingListFiles.map(f => {
+        const { meta, body } = parseFrontmatter(f.content);
+        return `<div class="card"><h3>${esc(meta.title || f.name.replace('.md',''))}</h3>${markdownToHtml(body)}</div>`;
+      }).join('');
+    }
+
+    document.getElementById('searchBar').addEventListener('input', renderRecipeTable);
+    document.querySelectorAll('.recipe-table th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const field = th.dataset.sort;
+        if (sortField === field) sortAsc = !sortAsc;
+        else { sortField = field; sortAsc = true; }
+        renderRecipeTable();
+      });
+    });
+  </script>
+</body>
+</html>

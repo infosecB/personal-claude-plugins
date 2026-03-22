@@ -18,14 +18,19 @@ Generate meal plans, shopping lists, and nutritional summaries from recipes in `
    - Difficulty preference (weeknight = easy/medium)
    - Servings per meal
 
-2. **Select recipes** from available collection:
+2. **Check recipe availability**:
+   - Glob `./recipes/*.md` to inventory all existing recipes
+   - **Only use existing recipes** — never invent or generate placeholder recipes for the meal plan
+   - If fewer than 5 recipes are available, **stop and ask the user** if they'd like to brainstorm and add new recipes before creating a meal plan
+   - If enough recipes exist, proceed to selection
+
+3. **Select recipes** from the available collection:
    - Vary cuisines across the week
    - Mix difficulty levels (simpler on weekdays)
    - Respect dietary restrictions
    - Reuse ingredients across meals to reduce shopping
-   - If not enough recipes for a full week, note which slots need new recipes
 
-3. **Format the meal plan**:
+4. **Format the meal plan** (reference recipes by title only — do not include full recipe content):
 
 ```markdown
 # Meal Plan: March 22 - March 28, 2026
@@ -36,7 +41,7 @@ Generate meal plans, shopping lists, and nutritional summaries from recipes in `
 | Tue | ... | ... | ... |
 ```
 
-4. **Save** to `./meal-plans/YYYY-MM-DD-to-YYYY-MM-DD.md` if user wants it persisted.
+5. **Save** to `./meal-plans/YYYY-MM-DD-to-YYYY-MM-DD.md` if user wants it persisted. Each entry should reference the recipe file path (e.g., `./recipes/chicken-tikka-masala.md`) so the user can look up the full recipe.
 
 ## Shopping List Generation
 
