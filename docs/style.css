@@ -136,6 +136,24 @@ header nav a:hover { color: var(--text); text-decoration: none; }
   color: var(--green);
   font-family: 'SF Mono', 'Fira Code', monospace;
 }
+.install-box ol, .install-box ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+.install-box li {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.install-box code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--accent);
+}
 .install-box p {
   color: var(--text-muted);
   font-size: 14px;
