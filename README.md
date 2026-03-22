@@ -2,4 +2,4 @@
 
 A personal marketplace of plugins for Claude Code and Cowork (Claude Desktop).
 
-**[View full documentation](https://infosecb.github.io/infosecb-personal-claude-plugins/)**
+**[View full documentation](https://infosecb.github.io/personal-claude-plugins/)**
