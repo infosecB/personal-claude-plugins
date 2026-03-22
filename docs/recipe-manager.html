@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Manager - infosecB's Personal Claude Code Plugins</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="./" class="logo">infosecB / personal-claude-plugins</a>
+      <nav>
+        <a href="./">Marketplace</a>
+        <a href="https://github.com/infosecB/personal-claude-plugins">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="breadcrumb">
+      <a href="./">Marketplace</a> / Recipe Manager
+    </div>
+
+    <div class="page-header">
+      <h1>Recipe Manager</h1>
+      <p>Manage food recipes as markdown files. Create, search, plan meals, and import recipes.</p>
+      <div class="plugin-meta" style="margin-top: 12px;">
+        <span class="tag">v0.1.0</span>
+        <span class="tag">MIT</span>
+        <span class="tag">recipes</span>
+        <span class="tag">cooking</span>
+        <span class="tag">meal-planning</span>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="section-title">Skills</div>
+
+    <!-- Recipe CRUD -->
+    <div class="skill-section">
+      <div class="skill-header">
+        <h2>Recipe CRUD</h2>
+        <span class="skill-invoke">/recipe-manager:recipe-crud</span>
+      </div>
+      <p>Create, read, update, and delete food recipes stored as markdown files.</p>
+
+      <h3>Triggers</h3>
+      <p>Activates on phrases like "new recipe", "save recipe", "edit recipe", "delete recipe", "show recipe", "list recipes".</p>
+
+      <h3>Operations</h3>
+      <ul>
+        <li><strong>Create</strong> &mdash; Provide a title, ingredients, and instructions. The plugin infers cuisine, difficulty, dietary tags, and other metadata automatically.</li>
+        <li><strong>Read / View</strong> &mdash; View a recipe by name or list all recipes as a summary table.</li>
+        <li><strong>Update</strong> &mdash; Edit any field of an existing recipe. File renames automatically if the title changes.</li>
+        <li><strong>Delete</strong> &mdash; Remove a recipe after confirmation.</li>
+      </ul>
+
+      <h3>Example prompts</h3>
+      <ul>
+        <li>"Add a new recipe for chicken parmesan"</li>
+        <li>"Show me the chicken soup recipe"</li>
+        <li>"Change the servings on chicken soup to 6"</li>
+        <li>"Delete the chicken soup recipe"</li>
+        <li>"List all my recipes"</li>
+      </ul>
+    </div>
+
+    <!-- Recipe Search -->
+    <div class="skill-section">
+      <div class="skill-header">
+        <h2>Recipe Search</h2>
+        <span class="skill-invoke">/recipe-manager:recipe-search</span>
+      </div>
+      <p>Search, filter, and find recipes by ingredients, cuisine, tags, dietary restrictions, difficulty, or any combination.</p>
+
+      <h3>Triggers</h3>
+      <p>Activates on phrases like "find recipe", "search recipes", "what can I make with...", "recipes with", "show me all".</p>
+
+      <h3>Search types</h3>
+      <ul>
+        <li><strong>By ingredient</strong> &mdash; Find recipes containing specific ingredients.</li>
+        <li><strong>By cuisine</strong> &mdash; Filter by Italian, Indian, Mexican, Thai, etc.</li>
+        <li><strong>By tag</strong> &mdash; Search by tags like "easy", "weeknight", "pasta".</li>
+        <li><strong>By dietary restriction</strong> &mdash; Filter for vegetarian, vegan, gluten-free, etc.</li>
+        <li><strong>By difficulty</strong> &mdash; Find easy, medium, or hard recipes.</li>
+        <li><strong>Combined filters</strong> &mdash; Mix any criteria (e.g., "easy vegetarian Indian recipes").</li>
+        <li><strong>"What can I make with..."</strong> &mdash; List ingredients on hand and get ranked recipe matches with missing ingredient lists.</li>
+      </ul>
+
+      <h3>Example prompts</h3>
+      <ul>
+        <li>"What recipes do I have with chicken?"</li>
+        <li>"Find me easy vegetarian dinner recipes"</li>
+        <li>"What can I make with garlic, pasta, and olive oil?"</li>
+      </ul>
+    </div>
+
+    <!-- Meal Planning -->
+    <div class="skill-section">
+      <div class="skill-header">
+        <h2>Meal Planning</h2>
+        <span class="skill-invoke">/recipe-manager:meal-planning</span>
+      </div>
+      <p>Generate weekly meal plans, shopping lists, and nutritional summaries from your recipe collection.</p>
+
+      <h3>Triggers</h3>
+      <p>Activates on phrases like "meal plan", "plan my meals", "shopping list", "grocery list", "what should I eat this week".</p>
+
+      <h3>Features</h3>
+      <ul>
+        <li><strong>Weekly meal plans</strong> &mdash; Generates a plan that varies cuisines, balances difficulty (simpler on weekdays), respects dietary restrictions, and reuses ingredients to minimize shopping.</li>
+        <li><strong>Shopping lists</strong> &mdash; Aggregates ingredients from selected recipes, combines duplicates, and groups by category (Produce, Meat &amp; Seafood, Dairy &amp; Eggs, Pantry, Spices).</li>
+        <li><strong>Nutritional summaries</strong> &mdash; Approximate calories, protein/carbs/fat balance, and nutritional highlights per meal and per day.</li>
+      </ul>
+
+      <h3>Example prompts</h3>
+      <ul>
+        <li>"Plan my meals for next week"</li>
+        <li>"Generate a shopping list for this week's meal plan"</li>
+        <li>"Give me a vegetarian meal plan for the week"</li>
+      </ul>
+    </div>
+
+    <!-- Recipe Import -->
+    <div class="skill-section">
+      <div class="skill-header">
+        <h2>Recipe Import</h2>
+        <span class="skill-invoke">/recipe-manager:recipe-import</span>
+      </div>
+      <p>Parse and import recipes from unstructured text, copied content, or informal descriptions into the standard markdown format.</p>
+
+      <h3>Triggers</h3>
+      <p>Activates when you paste recipe text, share a recipe, or say "import a recipe", "save this recipe", "convert this recipe".</p>
+
+      <h3>How it works</h3>
+      <ol>
+        <li>Paste or describe the recipe in any format.</li>
+        <li>The plugin extracts title, ingredients, instructions, and metadata.</li>
+        <li>Missing fields are inferred (cuisine from ingredients, dietary from ingredient list, times estimated).</li>
+        <li>Informal measurements are normalized (e.g., "a handful of" becomes approximate standard units).</li>
+        <li>The formatted recipe is shown for review before saving.</li>
+      </ol>
+
+      <h3>Batch import</h3>
+      <p>For multiple recipes, each is processed separately with confirmation. Large batches can use the built-in <code>recipe-parser</code> agent for autonomous processing.</p>
+
+      <h3>Example prompts</h3>
+      <ul>
+        <li>"Import this recipe: [paste text]"</li>
+        <li>"Convert this recipe I found to markdown"</li>
+      </ul>
+    </div>
+
+    <!-- Recipe Format Reference -->
+    <div class="section-title">Recipe Format Reference</div>
+    <div class="skill-section">
+      <h2>Frontmatter Fields</h2>
+      <p>Every recipe is a markdown file with YAML frontmatter. These fields are required:</p>
+
+      <table class="format-table">
+        <thead>
+          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>title</code></td><td>string</td><td>Recipe name</td></tr>
+          <tr><td><code>cuisine</code></td><td>string</td><td>e.g., Italian, Indian, Mexican, Thai, Japanese, French</td></tr>
+          <tr><td><code>servings</code></td><td>integer</td><td>Number of servings</td></tr>
+          <tr><td><code>prep_time</code></td><td>string</td><td>"X min" or "X hr Y min"</td></tr>
+          <tr><td><code>cook_time</code></td><td>string</td><td>"X min" or "X hr Y min"</td></tr>
+          <tr><td><code>tags</code></td><td>string[]</td><td>Lowercase tags: ingredients, method, meal type</td></tr>
+          <tr><td><code>dietary</code></td><td>string[]</td><td>vegetarian, vegan, gluten-free, dairy-free, nut-free, low-carb, keto, paleo</td></tr>
+          <tr><td><code>difficulty</code></td><td>string</td><td>easy, medium, hard</td></tr>
+          <tr><td><code>date_added</code></td><td>string</td><td>YYYY-MM-DD</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Ingredient format</h3>
+      <p>Pattern: <code>- QUANTITY UNIT INGREDIENT, PREP_NOTES</code></p>
+      <p>Examples: <code>- 1 lb chicken breast, cubed</code> &middot; <code>- 2 cloves garlic, minced</code> &middot; <code>- salt and pepper to taste</code></p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      Built by <a href="https://github.com/infosecB">infosecB</a> &middot; MIT License
+    </div>
+  </footer>
+</body>
+</html>

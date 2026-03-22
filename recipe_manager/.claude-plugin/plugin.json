@@ -1,0 +1,11 @@
+{
+  "name": "recipe-manager",
+  "description": "Manage food recipes as markdown files. Create, search, plan meals, and import recipes.",
+  "version": "0.1.0",
+  "author": {
+    "name": "infosecb"
+  },
+  "repository": "",
+  "license": "MIT",
+  "keywords": ["recipes", "cooking", "meal-planning", "food", "markdown"]
+}

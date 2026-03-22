@@ -1,0 +1,18 @@
+{
+  "name": "infosecb-personal-claude-plugins",
+  "owner": {
+    "name": "infosecb"
+  },
+  "plugins": [
+    {
+      "name": "recipe-manager",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/infosecB/personal-claude-plugins.git",
+        "path": "recipe_manager",
+        "ref": "main"
+      },
+      "description": "Manage food recipes as markdown files. Create, search, plan meals, and import recipes."
+    }
+  ]
+}
